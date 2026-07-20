@@ -143,7 +143,7 @@ void IRAM_ATTR VGAController::VSyncInterrupt(void * arg)
 }
 
 
-void  VGAController::setPixelAt(PixelDesc const & pixelDesc, Rect & updateRect)
+void IRAM_ATTR VGAController::setPixelAt(PixelDesc const & pixelDesc, Rect & updateRect)
 {
   genericSetPixelAt(pixelDesc, updateRect,
                     [&] (RGB888 const & color)          { return preparePixel(color); },
@@ -154,7 +154,7 @@ void  VGAController::setPixelAt(PixelDesc const & pixelDesc, Rect & updateRect)
 
 // coordinates are absolute values (not relative to origin)
 // line clipped on current absolute clipping rectangle
-void  VGAController::absDrawLine(int X1, int Y1, int X2, int Y2, RGB888 color)
+void IRAM_ATTR VGAController::absDrawLine(int X1, int Y1, int X2, int Y2, RGB888 color)
 {
   genericAbsDrawLine(X1, Y1, X2, Y2, color,
                      [&] (RGB888 const & color)                   { return preparePixel(color); },
@@ -167,14 +167,14 @@ void  VGAController::absDrawLine(int X1, int Y1, int X2, int Y2, RGB888 color)
 
 
 // parameters not checked
-void  VGAController::rawFillRow(int y, int x1, int x2, RGB888 color)
+void IRAM_ATTR VGAController::rawFillRow(int y, int x1, int x2, RGB888 color)
 {
   rawFillRow(y, x1, x2, preparePixel(color));
 }
 
 
 // parameters not checked
-void  VGAController::rawFillRow(int y, int x1, int x2, uint8_t pattern)
+void IRAM_ATTR VGAController::rawFillRow(int y, int x1, int x2, uint8_t pattern)
 {
   auto row = m_viewPort[y];
   // fill first bytes before full 32 bits word
@@ -196,7 +196,7 @@ void  VGAController::rawFillRow(int y, int x1, int x2, uint8_t pattern)
 
 
 // parameters not checked
-void  VGAController::rawInvertRow(int y, int x1, int x2)
+void IRAM_ATTR VGAController::rawInvertRow(int y, int x1, int x2)
 {
   auto row = m_viewPort[y];
   for (int x = x1; x <= x2; ++x) {
@@ -208,7 +208,7 @@ void  VGAController::rawInvertRow(int y, int x1, int x2)
 
 // swaps all pixels inside the range x1...x2 of yA and yB
 // parameters not checked
-void  VGAController::swapRows(int yA, int yB, int x1, int x2)
+void IRAM_ATTR VGAController::swapRows(int yA, int yB, int x1, int x2)
 {
   uint8_t * rowA = (uint8_t*) m_viewPort[yA];
   uint8_t * rowB = (uint8_t*) m_viewPort[yB];
@@ -227,7 +227,7 @@ void  VGAController::swapRows(int yA, int yB, int x1, int x2)
 }
 
 
-void  VGAController::drawEllipse(Size const & size, Rect & updateRect)
+void IRAM_ATTR VGAController::drawEllipse(Size const & size, Rect & updateRect)
 {
   genericDrawEllipse(size, updateRect,
                      [&] (RGB888 const & color)          { return preparePixel(color); },
@@ -236,7 +236,7 @@ void  VGAController::drawEllipse(Size const & size, Rect & updateRect)
 }
 
 
-void  VGAController::clear(Rect & updateRect)
+void IRAM_ATTR VGAController::clear(Rect & updateRect)
 {
   hideSprites(updateRect);
   uint8_t pattern = preparePixel(getActualBrushColor());
@@ -248,7 +248,7 @@ void  VGAController::clear(Rect & updateRect)
 // scroll < 0 -> scroll UP
 // scroll > 0 -> scroll DOWN
 // Speciying horizontal scrolling region slow-down scrolling!
-void  VGAController::VScroll(int scroll, Rect & updateRect)
+void IRAM_ATTR VGAController::VScroll(int scroll, Rect & updateRect)
 {
   genericVScroll(scroll, updateRect,
                  [&] (int yA, int yB, int x1, int x2)        { swapRows(yA, yB, x1, x2); },              // swapRowsCopying
@@ -292,7 +292,7 @@ void  VGAController::VScroll(int scroll, Rect & updateRect)
 // Scrolling by other values requires up to three steps (scopose scrolling by 1, 2, 3 or 4): for example scrolling by 5 is scomposed to 4 and 1, scrolling
 // by 6 is 4 + 2, etc.
 // Horizontal scrolling region start and size (X2-X1+1) must be aligned to 32 bits, otherwise the unoptimized (very slow) version is used.
-void  VGAController::HScroll(int scroll, Rect & updateRect)
+void IRAM_ATTR VGAController::HScroll(int scroll, Rect & updateRect)
 {
   hideSprites(updateRect);
   uint8_t pattern8   = preparePixel(getActualBrushColor());
@@ -433,7 +433,7 @@ void  VGAController::HScroll(int scroll, Rect & updateRect)
 }
 
 
-void  VGAController::drawGlyph(Glyph const & glyph, GlyphOptions glyphOptions, RGB888 penColor, RGB888 brushColor, Rect & updateRect)
+void IRAM_ATTR VGAController::drawGlyph(Glyph const & glyph, GlyphOptions glyphOptions, RGB888 penColor, RGB888 brushColor, Rect & updateRect)
 {
   genericDrawGlyph(glyph, glyphOptions, penColor, brushColor, updateRect,
                    [&] (RGB888 const & color) { return preparePixel(color); },
@@ -443,7 +443,7 @@ void  VGAController::drawGlyph(Glyph const & glyph, GlyphOptions glyphOptions, R
 }
 
 
-void  VGAController::invertRect(Rect const & rect, Rect & updateRect)
+void IRAM_ATTR VGAController::invertRect(Rect const & rect, Rect & updateRect)
 {
   genericInvertRect(rect, updateRect,
                     [&] (int Y, int X1, int X2) { rawInvertRow(Y, X1, X2); }
@@ -451,7 +451,7 @@ void  VGAController::invertRect(Rect const & rect, Rect & updateRect)
 }
 
 
-void  VGAController::swapFGBG(Rect const & rect, Rect & updateRect)
+void IRAM_ATTR VGAController::swapFGBG(Rect const & rect, Rect & updateRect)
 {
   genericSwapFGBG(rect, updateRect,
                   [&] (RGB888 const & color)                  { return preparePixel(color); },
@@ -464,7 +464,7 @@ void  VGAController::swapFGBG(Rect const & rect, Rect & updateRect)
 
 // Slow operation!
 // supports overlapping of source and dest rectangles
-void  VGAController::copyRect(Rect const & source, Rect & updateRect)
+void IRAM_ATTR VGAController::copyRect(Rect const & source, Rect & updateRect)
 {
   genericCopyRect(source, updateRect,
                   [&] (int y)                                 { return (uint8_t*) m_viewPort[y]; },
@@ -511,7 +511,7 @@ void VGAController::writeScreen(Rect const & rect, RGB222 * srcBuf)
 }
 
 
-void  VGAController::rawDrawBitmap_Native(int destX, int destY, Bitmap const * bitmap, int X1, int Y1, int XCount, int YCount)
+void IRAM_ATTR VGAController::rawDrawBitmap_Native(int destX, int destY, Bitmap const * bitmap, int X1, int Y1, int XCount, int YCount)
 {
   genericRawDrawBitmap_Native(destX, destY, (uint8_t*) bitmap->data, bitmap->width, X1, Y1, XCount, YCount,
                               [&] (int y)                             { return (uint8_t*) m_viewPort[y]; },         // rawGetRow
@@ -520,7 +520,7 @@ void  VGAController::rawDrawBitmap_Native(int destX, int destY, Bitmap const * b
 }
 
 
-void  VGAController::rawDrawBitmap_Mask(int destX, int destY, Bitmap const * bitmap, void * saveBackground, int X1, int Y1, int XCount, int YCount)
+void IRAM_ATTR VGAController::rawDrawBitmap_Mask(int destX, int destY, Bitmap const * bitmap, void * saveBackground, int X1, int Y1, int XCount, int YCount)
 {
   auto foregroundPattern = preparePixel(bitmap->foregroundColor);
   genericRawDrawBitmap_Mask(destX, destY, bitmap, (uint8_t*)saveBackground, X1, Y1, XCount, YCount,
@@ -531,7 +531,7 @@ void  VGAController::rawDrawBitmap_Mask(int destX, int destY, Bitmap const * bit
 }
 
 
-void  VGAController::rawDrawBitmap_RGBA2222(int destX, int destY, Bitmap const * bitmap, void * saveBackground, int X1, int Y1, int XCount, int YCount)
+void IRAM_ATTR VGAController::rawDrawBitmap_RGBA2222(int destX, int destY, Bitmap const * bitmap, void * saveBackground, int X1, int Y1, int XCount, int YCount)
 {
   genericRawDrawBitmap_RGBA2222(destX, destY, bitmap, (uint8_t*)saveBackground, X1, Y1, XCount, YCount,
                                 [&] (int y)                             { return (uint8_t*) m_viewPort[y]; },                   // rawGetRow
@@ -541,7 +541,7 @@ void  VGAController::rawDrawBitmap_RGBA2222(int destX, int destY, Bitmap const *
 }
 
 
-void  VGAController::rawDrawBitmap_RGBA8888(int destX, int destY, Bitmap const * bitmap, void * saveBackground, int X1, int Y1, int XCount, int YCount)
+void IRAM_ATTR VGAController::rawDrawBitmap_RGBA8888(int destX, int destY, Bitmap const * bitmap, void * saveBackground, int X1, int Y1, int XCount, int YCount)
 {
   genericRawDrawBitmap_RGBA8888(destX, destY, bitmap, (uint8_t*)saveBackground, X1, Y1, XCount, YCount,
                                  [&] (int y)                                      { return (uint8_t*) m_viewPort[y]; },   // rawGetRow
